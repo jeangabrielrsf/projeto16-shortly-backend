@@ -7,4 +7,6 @@ server.use(express.json());
 server.use(cors());
 server.use(router);
 
-server.listen(4000, () => console.log("listening on port 4000..."));
+server.listen(process.env.PORT, () =>
+	console.log(`Listening on port ${process.env.PORT} ....`)
+);
