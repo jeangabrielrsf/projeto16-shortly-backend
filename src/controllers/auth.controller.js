@@ -78,12 +78,11 @@ async function signIn(req, res) {
 			password,
 			userExists.rows[0].password
 		);
-		console.log(decryptPassword);
+
 		if (!decryptPassword) {
 			return res.sendStatus(401);
 		}
 
-		console.log(userExists.rows[0].id);
 		const token = uuid();
 		connection.query(
 			`
