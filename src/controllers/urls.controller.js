@@ -119,4 +119,64 @@ async function redirectToUrl(req, res) {
 	res.redirect(shortUrlExists.rows[0].url);
 }
 
-export { shortenUrl, getUrl, redirectToUrl };
+async function deleteUrl(req, res) {
+	try {
+		const { authorization } = req.headers;
+		const { id } = req.params;
+		const token = authorization?.replace("Bearer ", "");
+		if (!token) {
+			return res.sendStatus(401);
+		}
+
+		const urlExists = await connection.query(
+			`
+            SELECT *
+            FROM urls
+            WHERE id = $1; 
+        `,
+			[id]
+		);
+		if (urlExists.rowCount === 0) {
+			return res.sendStatus(404);
+		}
+		const urlOwner = await connection.query(
+			`
+        SELECT * 
+        FROM urls 
+        JOIN sessions ON urls."userId" = sessions."userId"
+        WHERE sessions.token = $1;
+        `,
+			[token]
+		);
+
+		if (urlOwner.rowCount === 0) {
+			return res.sendStatus(401);
+		}
+
+		await connection.query(
+			`
+            DELETE
+            FROM visits
+            WHERE "urlId" = $1 
+            ;
+        `,
+			[id]
+		);
+
+		await connection.query(
+			`
+            DELETE 
+            FROM urls
+            WHERE id = $1;
+        `,
+			[id]
+		);
+
+		return res.sendStatus(204);
+	} catch (error) {
+		console.log(error);
+		return res.sendStatus(500);
+	}
+}
+
+export { shortenUrl, getUrl, redirectToUrl, deleteUrl };
