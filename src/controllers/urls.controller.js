@@ -38,6 +38,7 @@ async function shortenUrl(req, res) {
         `,
 			[url, userId.rows[0].userId]
 		);
+		console.log(checkUrl);
 		if (checkUrl.rowCount > 0) {
 			return res
 				.status(409)
