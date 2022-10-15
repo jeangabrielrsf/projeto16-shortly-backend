@@ -58,4 +58,28 @@ async function shortenUrl(req, res) {
 	}
 }
 
-export { shortenUrl };
+async function getUrl(req, res) {
+	try {
+		const { id } = req.params;
+
+		const idCheck = await connection.query(
+			`
+            SELECT * FROM urls WHERE id = $1;
+        `,
+			[id]
+		);
+		if (idCheck.rowCount === 0) {
+			return res.sendStatus(404);
+		}
+
+		delete idCheck.rows[0].userId;
+		delete idCheck.rows[0].createdAt;
+
+		return res.status(200).send(idCheck.rows[0]);
+	} catch (error) {
+		console.log(error);
+		return res.sendStatus(500);
+	}
+}
+
+export { shortenUrl, getUrl };
