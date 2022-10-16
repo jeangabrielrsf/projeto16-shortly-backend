@@ -84,7 +84,18 @@ async function signIn(req, res) {
 		}
 
 		const token = uuid();
-		connection.query(
+		const userLogged = await connection.query(
+			`
+			SELECT * FROM sessions
+			WHERE "userId" = $1; 
+		`,
+			[userExists.rows[0].id]
+		);
+
+		if (userLogged.rowCount > 0) {
+			return res.status(200).send(userLogged.rows[0].token);
+		}
+		await connection.query(
 			`
 		    INSERT INTO sessions (token, "userId") VALUES ($1, $2);
 		`,
