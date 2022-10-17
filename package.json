@@ -5,7 +5,8 @@
 	"type": "module",
 	"main": "index.js",
 	"scripts": {
-		"start": "npx nodemon src/server.js"
+		"start": "node ./src/server.js",
+		"startN": "npx nodemon src/server.js"
 	},
 	"keywords": [],
 	"author": "",
